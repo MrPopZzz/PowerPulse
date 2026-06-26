@@ -7,6 +7,7 @@ import java.net.URI;
 import org.springframework.cloud.gateway.server.mvc.filter.CircuitBreakerFilterFunctions;
 
 import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.uri;
+import static org.springframework.cloud.gateway.server.mvc.filter.BeforeFilterFunctions.setPath;
 
 import org.springframework.cloud.gateway.server.mvc.handler.GatewayRouterFunctions;
 import org.springframework.context.annotation.Bean;
@@ -38,5 +39,14 @@ public class UserServiceRoutes {
 						request -> ServerResponse.status(HttpStatus.SERVICE_UNAVAILABLE)
 				.body("User service is down"))
 		.build();		
+	}
+	
+	@Bean
+	public RouterFunction<ServerResponse> userServiceApiDocs() {
+		return GatewayRouterFunctions.route("user-service-api-docs")
+				.route(RequestPredicates.path("/docs/user-service/v3/api-docs"), http())
+				.before(uri("http://localhost:8080"))
+				.before(setPath("/v3/api-docs"))      // filter not working
+				.build();
 	}
 }
